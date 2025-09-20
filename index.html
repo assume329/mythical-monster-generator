@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神话志怪生成器</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'SimSun', 'FangSong', serif;
+            background-color: #f7f3e9;
+            color: #333;
+            line-height: 1.8;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNmNWYzZTgiPjwvcmVjdD4KPC9zdmc+');
+        }
+        
+        /* 容器样式 */
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 头部样式 */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid #d4c8b0;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: #5d4037;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            font-weight: normal;
+            letter-spacing: 5px;
+        }
+        
+        /* 开场白样式 */
+        .introduction {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.6;
+            font-size: 1.1rem;
+            color: #5d4037;
+            border: 1px solid #e0d5c0;
+        }
+        
+        /* 输入区域样式 */
+        .input-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 1px solid #e0d5c0;
+        }
+        
+        input[type="text"] {
+            padding: 12px 15px;
+            font-size: 1.1rem;
+            width: 350px;
+            border: 1px solid #d4c8b0;
+            border-radius: 4px;
+            background-color: #fffdf8;
+            font-family: 'SimSun', serif;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #8d6e63;
+            box-shadow: 0 0 5px rgba(141, 110, 99, 0.2);
+        }
+        
+        button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            background-color: #8d6e63;
+            color: #fffdf8;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 15px;
+            font-family: 'SimSun', serif;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #6d4c41;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        /* 加载状态样式 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8d6e63;
+            display: none;
+            font-size: 1.1rem;
+        }
+        
+        .loading::after {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #8d6e63;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 结果区域样式 */
+        .result-section {
+            display: none;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #e0d5c0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        
+        .result-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0d5c0;
+            font-size: 1.4rem;
+            color: #5d4037;
+            letter-spacing: 3px;
+        }
+        
+        .result-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .description-box, .story-box {
+            padding: 20px;
+            background-color: #fffdf8;
+            border-radius: 6px;
+            border-left: 3px solid #8d6e63;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .description-box h3, .story-box h3 {
+            color: #8d6e63;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            font-weight: normal;
+        }
+        
+        .image-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #fffdf8;
+            border-radius: 6px;
+        }
+        
+        .image-box h3 {
+            color: #8d6e63;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: normal;
+        }
+        
+        #monsterImage {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            border: 1px solid #e0d5c0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* 页脚样式 */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #8d6e63;
+            font-size: 0.9rem;
+            margin-top: auto;
+            border-top: 1px solid #d4c8b0;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+                letter-spacing: 3px;
+            }
+            
+            .input-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            input[type="text"] {
+                width: 100%;
+            }
+            
+            button {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .result-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>神话志怪生成器</h1>
+        </header>
+        
+        <div class="introduction">
+            <p>余乃上古秘卷守护灵，通《山海经》之奇，晓《聊斋》之异。
+            客官若有好奇，可书神怪之名（如"狐仙"、"龙"），
+            吾当为汝描绘其形、讲述其事、呈现其像。</p>
+        </div>
+        
+        <div class="input-section">
+            <input type="text" id="monsterName" placeholder="请输入神怪名字">
+            <button id="searchBtn">召 唤</button>
+            <button id="randomBtn">随 机</button>
+        </div>
+        
+        <div id="loading" class="loading">
+            正在开卷显灵...
+        </div>
+        
+        <div id="result" class="result-section">
+            <div class="result-header">
+                【<span id="monsterTitle"></span>】之象
+            </div>
+            <div class="result-content">
+                <div class="description-box">
+                    <h3>形：</h3>
+                    <p id="appearanceText"></p>
+                </div>
+                <div class="story-box">
+                    <h3>事：</h3>
+                    <p id="storyText"></p>
+                </div>
+                <div class="image-box">
+                    <h3>绘：</h3>
+                    <img id="monsterImage" src="" alt="神怪水墨图">
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>上古秘卷守护灵 恭呈</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
